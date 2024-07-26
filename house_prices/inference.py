@@ -1,3 +1,14 @@
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_log_error
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+from IPython.display import display
+
 def make_predictions(input_data: pd.DataFrame) -> np.ndarray:
     
     dataset_for_testing = r"C:/Users/edwin victor/git repositories/dsp-edwinvictor-justin/data/test.csv"
@@ -9,6 +20,11 @@ def make_predictions(input_data: pd.DataFrame) -> np.ndarray:
     Testing_df = pd.read_csv(dataset_for_testing)
     scaler = joblib.load(scaler_location)
     encoder = joblib.load(encoder_location)
+
+    selected_features = ['LotArea', 'GrLivArea', 'Neighborhood', 'HouseStyle'] # 2 continuos and 2 Categorical features
+    target_feature = ['SalePrice']
+    continuos_datatype_features = ['LotArea', 'GrLivArea']
+    discrete_datatype_features = ['Neighborhood', 'HouseStyle']
     
     test_scaled = scaler.transform(Testing_df[continuos_datatype_features])
     test_encoded = encoder.transform(Testing_df[discrete_datatype_features])

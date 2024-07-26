@@ -1,11 +1,25 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_log_error
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
+from IPython.display import display
 def build_model(data: pd.DataFrame) -> dict[str, str]:
+
+    selected_features = ['LotArea', 'GrLivArea', 'Neighborhood', 'HouseStyle'] # 2 continuos and 2 Categorical features
+    target_feature = ['SalePrice']
+    continuos_datatype_features = ['LotArea', 'GrLivArea']
+    discrete_datatype_features = ['Neighborhood', 'HouseStyle']
 
 ## Training_set
     
     # 1) splitting the dataset
     
-    X = Training_dataset.drop(target_feature, axis=1)
-    y = Training_dataset[target_feature]
+    X = data.drop(target_feature, axis=1)
+    y = data[target_feature]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=50)
 
 
