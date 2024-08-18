@@ -1,85 +1,42 @@
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_log_error
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
-from IPython.display import display
-def build_model(data: pd.DataFrame) -> dict[str, str]:
 
-    selected_features = ['LotArea', 'GrLivArea', 'Neighborhood', 'HouseStyle'] # 2 continuos and 2 Categorical features
-    target_feature = ['SalePrice']
-    continuos_datatype_features = ['LotArea', 'GrLivArea']
-    discrete_datatype_features = ['Neighborhood', 'HouseStyle']
-
-## Training_set
-    
-    # 1) splitting the dataset
-    
-    X = data.drop(target_feature, axis=1)
-    y = data[target_feature]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=50)
-
-
-    # 2) Extracting the features from training set
-    
-    Extracted_Selected_Features_For_Training = X_train[selected_features]
-    Extracted_Target_Attribute = y_train[target_feature]
-    Training_Features = pd.concat([Extracted_Selected_Features_For_Training,y_train], axis=1)
-
-    # 3) Encoding the categorical columns from training set
-
-    encoder = OneHotEncoder(sparse_output= False)
-    encoder.fit(Training_Features[discrete_datatype_features])
-    Training_encoded_categories = encoder.transform(Training_Features[discrete_datatype_features])
-    encoded_discrete_features_training_df = pd.DataFrame(Training_encoded_categories, columns=encoder.get_feature_names_out(discrete_datatype_features))
-
-    # 4) Scaling the continuos columns from training set
-
-    scaler = StandardScaler()
-    scaler.fit(X_train[continuos_datatype_features])
-    scaled_continuos_features_training_df = scaler.transform(X_train[continuos_datatype_features])
-
-    # 5) Concatenating the processed training set
-    
-    training_continuous_features_df = pd.DataFrame(scaled_continuos_features_training_df , columns= continuos_datatype_features)
-    Processed_Training_Df = pd.concat([training_continuous_features_df, encoded_discrete_features_training_df] , axis=1)
-
-    # 6) Fitting the model
-    
+def build_model(combined_features_df: pd.DataFrame, y_train: pd.Series, model_path: str, scaler_path: str, encoder_path: str, scaler, encoder):
     model = LinearRegression()
-    model.fit(Processed_Training_Df, y_train)
+    model.fit(combined_features_df, y_train)
+    joblib.dump(model, model_path)
+    joblib.dump(scaler, scaler_path)
+    joblib.dump(encoder, encoder_path)
+    return model
 
-## Testing_set   
+def process_testing_set(X_test: pd.DataFrame, categorical_features: list, continuous_features: list, encoder, scaler, model) -> pd.DataFrame:
+    # Encode categorical features
+    
+    encoder = joblib.load(encoder)
+    scaler = joblib.load(scaler)
+    categorical_df = X_test[categorical_features]
+    continuous_df = X_test[continuous_features]
 
-    # 1) Extracting the features from testing set
+    encoded_categories = encoder.transform(categorical_df)
+    encoded_df = pd.DataFrame(encoded_categories, columns=encoder.get_feature_names_out(categorical_features))
     
-    Extracted_Features_Testing = X_test[selected_features]
-    Testing_Features = pd.concat([Extracted_Features_Testing,y_test], axis=1)
+    # Scale continuous features
+    scaled_features = scaler.transform(continuous_df)
+    scaled_df = pd.DataFrame(scaled_features, columns=continuous_features)
+    
+    # Concatenate features
+    processed_test_df = pd.concat([scaled_df, encoded_df], axis =1)
+    y_pred = model.predict(processed_test_df)
+    return processed_test_df,y_pred
 
-    # 2) Encoding the categorical columns from testing set
-    
-    encoder.fit(Testing_Features[discrete_datatype_features])
-    Testing_encoded_categories = encoder.transform(Testing_Features[discrete_datatype_features])
-    encoded_discrete_features_testing_df = pd.DataFrame(Testing_encoded_categories, columns=encoder.get_feature_names_out(discrete_datatype_features))
+def evaluate_model(y_test: pd.Series, y_pred: np.ndarray) -> dict[str, str]:
+    Rmsle = np.sqrt(mean_squared_log_error(y_test, y_pred))
+    return {'Root Mean Squared Error out of': str(Rmsle)}
 
-    # 3) Scaling the continuos columns from testing set
-    
-    scaler.fit(X_test[continuos_datatype_features])
-    scaled_continuos_features_testing_df = scaler.transform(X_test[continuos_datatype_features])
-
-    # 4) Concatenating the processed testing set
-    
-    testing_continuous_features_df = pd.DataFrame(scaled_continuos_features_testing_df , columns= continuos_datatype_features)
-    Processed_Testing_Df = pd.concat([testing_continuous_features_df, encoded_discrete_features_testing_df] , axis=1)
-    
-    # 5) Making prediction 
-    
-    y_pred = model.predict(Processed_Testing_Df)
-
-    # 6) Evaluating the model
-    
-    Rmsle = np.sqrt(mean_squared_log_error(y_test, y_pred)) 
-    return {'Root Mean Squared Error out of': str(Rmsle) }
