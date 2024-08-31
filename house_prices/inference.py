@@ -23,7 +23,7 @@ def load_models(model_path: str, scaler_path: str, encoder_path: str):
     return model, scaler, encoder
 
 
-def preprocess_data_and_predict(
+def make_predictions(
     Testing_df: pd.DataFrame,
     scaler,
     encoder,

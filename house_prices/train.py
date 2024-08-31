@@ -52,7 +52,7 @@ def process_testing_set(
         scaler,
         model) -> pd.DataFrame:
     """
-    Process the testing set and generate predictions.
+    Processes the testing set and generate predictions.
 
     Encodes categorical features and scales continuous features
     in the testing set using the provided encoder and scaler.
@@ -94,7 +94,7 @@ def evaluate_model(
         y_test: pd.Series,
         y_pred: np.ndarray) -> dict[str, str]:
     """
-    Evaluate the model's performance using
+    Evaluates the model's performance using
     Root Mean Squared Logarithmic Error (RMSLE) metric.
     It returns a dictionary containing
     the RMSLE value as a string.
