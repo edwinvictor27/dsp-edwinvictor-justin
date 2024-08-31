@@ -101,7 +101,7 @@ def scale_continuous_features(
         continuous_features: list
 ) -> pd.DataFrame:
     """
-    Scale continuous features in a DataFrame using standard scaling.
+    Scale continuous features in DataFrame using standard scaling.
 
     Args:
         df (pd.DataFrame): The DataFrame containing the data to scale.
