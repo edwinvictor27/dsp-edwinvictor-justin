@@ -1,0 +1,3 @@
+# requirement file that contains packages required to run ml environment
+Python==3.9.0
+jupyter==1.0.0
