@@ -79,29 +79,6 @@ dsp-edwin-victor-justin/
 └── .gitignore
 ```
 
----
-
-## 📊 Results
-
-Add your actual model evaluation results here.
-
-Recommended metrics for regression:
-
-- Mean Absolute Error (MAE)
-- Mean Squared Error (MSE)
-- Root Mean Squared Error (RMSE)
-- R² Score
-
-Example:
-
-```text
-Model: Linear Regression
-MAE: [Add result]
-RMSE: [Add result]
-R² Score: [Add result]
-```
-
----
 
 ## 🚀 Future Improvements
 
